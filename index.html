@@ -640,8 +640,11 @@
                     </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 2rem;">
+                <div style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                     <button class="reset-button" onclick="location.reload()">別の運命を読む</button>
+                    <button class="reset-button" onclick="shareToX('${creature.name}', '${creature.emoji}', '${isUpright ? '正位置' : '逆位置'}')">
+                        🐦 Xでシェア
+                    </button>
                 </div>
             `;
 
@@ -649,6 +652,14 @@
             resultsSection.innerHTML = resultsHTML;
             resultsSection.classList.remove('hidden');
         });
+
+        // Share to X function
+        function shareToX(creatureName, emoji, position) {
+            const text = `${emoji}幻獣占いで『${creatureName}』が出ました！\n${position}\n\nあなたの幻獣は何でしょう？🐉`;
+            const url = encodeURIComponent(text);
+            const xUrl = `https://x.com/intent/tweet?text=${url}`;
+            window.open(xUrl, '_blank');
+        }
     </script>
 </body>
 </html>
