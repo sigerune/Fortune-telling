@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐉 幻獣占い - 喜怒哀楽×正逆位置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 0.8rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 2px solid #1a1a2e;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5);
+        }
+
+        .result-card {
+            text-align: center;
+        }
+
+        .result-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .result-name {
+            font-size: 1.3rem;
+            margin: 0 0 0.3rem;
+            font-weight: 700;
+        }
+
+        .position {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .emotion-box {
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .emotion-label {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .reading-box {
+            background: #f9f9f9;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .reading-box p {
+            margin: 0 0 0.4rem;
+            color: #666;
+        }
+
+        .reading-meaning {
+            font-weight: 500;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .trait-item {
+            background: #f9f9f9;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        .trait-label {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .position-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .position-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 0.8rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .position-card h3 {
+            color: #1a1a2e;
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .position-card p {
+            color: #666;
+            margin: 0 0 0.3rem;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .position-card.inactive {
+            opacity: 0.5;
+        }
+
+        .secondary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .secondary-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .secondary-card h3 {
+            color: #1a1a2e;
+            margin: 0 0 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .secondary-card p {
+            color: #666;
+            margin: 0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .reset-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #form-section {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        #results-section {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .secondary-cards {
+                grid-template-columns: 1fr;
+            }
+            .position-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐉 幻 獣 占 い 🐉</h1>
+            <p>あなたの内に秘めた幻獣の姿を明かします</p>
+        </div>
+
+        <!-- Form Section -->
+        <div id="form-section">
+            <div class="card">
+                <form id="fortune-form">
+                    <div class="form-group">
+                        <label for="birthdate">生年月日を選択</label>
+                        <input type="date" id="birthdate" required max="">
+                    </div>
+                    <button type="submit" id="submit-btn">幻獣の運命を読む</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden"></div>
+    </div>
+
+    <script>
+        const MYTHICAL_CREATURES = [
+            {
+                name: 'ドラゴン',
+                emoji: '🐉',
+                color: '#FF6B6B',
+                emotions: {
+                    joy: { label: '喜', desc: '栄光と勝利への道が開ける。圧倒的な成功を手にします' },
+                    anger: { label: '怒', desc: '力を発揮する時。障害を打ち破る強い意志が湧き上がります' },
+                    sorrow: { label: '哀', desc: '高い理想と現実のギャップ。孤独感に包まれることも' },
+                    calm: { label: '楽', desc: '王者の余裕。静かな確信と深い思慮を備えます' }
+                },
+                upright: {
+                    meaning: '力強いリーダーシップが発動します',
+                    aspect: '支配欲、カリスマ、成功、決断力',
+                    advice: '自分の力を信じて、大きく動きましょう'
+                },
+                reversed: {
+                    meaning: '傲慢さや支配欲が足を引っ張ります',
+                    aspect: '横暴、孤立、破壊的な衝動',
+                    advice: '周囲の意見に耳を傾け、謙虚さを忘れずに'
+                }
+            },
+            {
+                name: 'ユニコーン',
+                emoji: '🦄',
+                color: '#A78BFA',
+                emotions: {
+                    joy: { label: '喜', desc: '希望と癒しに満ちた時期。周囲も幸せにします' },
+                    anger: { label: '怒', desc: '正義のための怒り。不正に立ち向かう勇気が湧きます' },
+                    sorrow: { label: '哀', desc: '理想主義ゆえの失望。現実の厳しさに傷つきます' },
+                    calm: { label: '楽', desc: '深い内省と精神的な安定。真実への道を歩みます' }
+                },
+                upright: {
+                    meaning: '純粋さと誠実さが光の道を作ります',
+                    aspect: '希望、優雅さ、癒し、理想',
+                    advice: 'あなたの純真さを大切に'
+                },
+                reversed: {
+                    meaning: 'あまりに理想を求めすぎて現実を見失っています',
+                    aspect: '幻想、不幸な現実、精神的な迷走',
+                    advice: '足を地に付けて、小さな幸せを見つけましょう'
+                }
+            },
+            {
+                name: 'フェニックス',
+                emoji: '🔥',
+                color: '#FCD34D',
+                emotions: {
+                    joy: { label: '喜', desc: '新しい人生の幕開け。すべてが燃え上がり再生します' },
+                    anger: { label: '怒', desc: '破壊と再生の炎。古い殻を破り捨てる時です' },
+                    sorrow: { label: '哀', desc: '灰の中で呻く時期。終わりを受け入れる覚悟が必要' },
+                    calm: { label: '楽', desc: '次への準備期間。静かに力を蓄えています' }
+                },
+                upright: {
+                    meaning: '死と再生のサイクルが回転しています',
+                    aspect: '復活、革新、希望、可能性',
+                    advice: '今は苦しくても、必ず光が訪れます'
+                },
+                reversed: {
+                    meaning: '再生のチャンスを逃している状態です',
+                    aspect: '停滞、執着、復活の失敗',
+                    advice: '古いものを手放す勇気を持ちましょう'
+                }
+            },
+            {
+                name: 'グリフォン',
+                emoji: '🦅',
+                color: '#34D399',
+                emotions: {
+                    joy: { label: '喜', desc: '高い視点から全体が見える。最良の判断ができます' },
+                    anger: { label: '怒', desc: 'ルール破壊者への激怒。正義感が燃え上がります' },
+                    sorrow: { label: '哀', desc: '責任の重さに押しつぶされそう。すべてを守ろうとします' },
+                    calm: { label: '楽', desc: '落ち着きと確実性。信頼できる存在として輝きます' }
+                },
+                upright: {
+                    meaning: '守護と洞察の力が最高潮です',
+                    aspect: '保護、警戒、高い視点、確実性',
+                    advice: 'あなたの直感と判断を信頼してください'
+                },
+                reversed: {
+                    meaning: 'あまりに警戒心が強く、機会を逃しています',
+                    aspect: '過度な心配、支配欲、視野の狭さ',
+                    advice: '時には身を委ねて、他者を信頼してみましょう'
+                }
+            },
+            {
+                name: 'ペガサス',
+                emoji: '🏇',
+                color: '#38BDF8',
+                emotions: {
+                    joy: { label: '喜', desc: '自由の喜びに満ちた時。翼を広げて飛び立てます' },
+                    anger: { label: '怒', desc: '束縛への反発。自由を奪う者への怒りが爆発します' },
+                    sorrow: { label: '哀', desc: '翼が折れた状態。落地への恐怖と寂しさ' },
+                    calm: { label: '楽', desc: '心の静寂。どこにでも行ける自信があります' }
+                },
+                upright: {
+                    meaning: 'あらゆる制限を超える自由が訪れます',
+                    aspect: '自由、冒険、迅速性、理想',
+                    advice: '躊躇わず、あなたの道を歩みましょう'
+                },
+                reversed: {
+                    meaning: '自由への執着が逆に束縛しています',
+                    aspect: '浮つき、根気不足、逃げ癖',
+                    advice: 'どこかに着地して、深く根を張ることも大切です'
+                }
+            },
+            {
+                name: 'セイレーン',
+                emoji: '🧜',
+                color: '#06B6D4',
+                emotions: {
+                    joy: { label: '喜', desc: '魅惑と創造の喜び。心が歌い、他者も惹きつけられます' },
+                    anger: { label: '怒', desc: '深い水の怒り。静かだが絶対的。相手を沈める力を持ちます' },
+                    sorrow: { label: '哀', desc: '深海の悲しみ。深い傷と秘密を抱えています' },
+                    calm: { label: '楽', desc: '謎めいた落ち着き。内なる世界の充実' }
+                },
+                upright: {
+                    meaning: '魅力と直感があなたを導きます',
+                    aspect: '魅惑、芸術性、直感、知恵',
+                    advice: 'あなたの神秘的な力を信じてください'
+                },
+                reversed: {
+                    meaning: 'その魅力が人を誤った道へ導いています',
+                    aspect: '幻想、誘惑、欺き、混乱',
+                    advice: '自分の影の側面と向き合う時です'
+                }
+            },
+            {
+                name: 'スフィンクス',
+                emoji: '🦁',
+                color: '#D4A574',
+                emotions: {
+                    joy: { label: '喜', desc: '謎が解ける喜び。深い理解と知識が光ります' },
+                    anger: { label: '怒', desc: 'ふさわしくない者への容赦ない厳しさ' },
+                    sorrow: { label: '哀', desc: '孤独な叡者。誰も自分を理解できない悲しみ' },
+                    calm: { label: '楽', desc: '永遠の静寂。時間を超えた安定感' }
+                },
+                upright: {
+                    meaning: '謎かけと知識の番人が目覚めます',
+                    aspect: '知恵、秘密、探究、理解',
+                    advice: '答えは自分の中にあります'
+                },
+                reversed: {
+                    meaning: 'その答えは本当に正しいのか、疑いの時間です',
+                    aspect: '謎のまま、混乱、知識不足',
+                    advice: '謙虚に学び直す時期が来ています'
+                }
+            },
+            {
+                name: 'バジリスク',
+                emoji: '🐍',
+                color: '#A855F7',
+                emotions: {
+                    joy: { label: '喜', desc: '変身と強大な力の喜び。新しい自分に生まれ変わります' },
+                    anger: { label: '怒', desc: 'あらがえない怒り。この力の前に何も立ちはだかれません' },
+                    sorrow: { label: '哀', desc: '変身の苦しみ。自分が何者かわからなくなります' },
+                    calm: { label: '楽', desc: '深い瞑想状態。毒と力の均衡' }
+                },
+                upright: {
+                    meaning: '根本的な変容が始まります',
+                    aspect: '変身、隠れた力、破壊と再構築',
+                    advice: '恐れずに変わっていきましょう'
+                },
+                reversed: {
+                    meaning: 'その変化は本当に必要なのか、抵抗が生じています',
+                    aspect: '停滞した変化、恐怖、破壊的',
+                    advice: '今は変わるべき時ではないかもしれません'
+                }
+            },
+            {
+                name: 'ケルベロス',
+                emoji: '🐺',
+                color: '#6366F1',
+                emotions: {
+                    joy: { label: '喜', desc: '仲間の絆の喜び。群れの力が感じられます' },
+                    anger: { label: '怒', desc: '仲間を傷つける者への圧倒的な怒り' },
+                    sorrow: { label: '哀', desc: '仲間を失う悲しみ。群れの一員でありながら孤独' },
+                    calm: { label: '楽', desc: '多頭の調和。複数の視点を持つ安定感' }
+                },
+                upright: {
+                    meaning: '強い結束と忠誠が力になります',
+                    aspect: '忠誠心、団結力、守護、信頼',
+                    advice: '仲間を信じ、一緒に進みましょう'
+                },
+                reversed: {
+                    meaning: 'その絆があなたを縛り付けています',
+                    aspect: '分裂、裏切り、執着、支配',
+                    advice: '時には自分の道を歩む勇気も必要です'
+                }
+            },
+            {
+                name: 'クラーケン',
+                emoji: '🐙',
+                color: '#3B82F6',
+                emotions: {
+                    joy: { label: '喜', desc: '多くの可能性への喜び。八本の腕で世界を掴みます' },
+                    anger: { label: '怒', desc: '深海からの激怒。多角的な攻撃が始まります' },
+                    sorrow: { label: '哀', desc: '深淵の悲しみ。多くの能力があるのに使いきれない悔しさ' },
+                    calm: { label: '楽', desc: 'しなやかな適応。すべての状況に対応できる余裕' }
+                },
+                upright: {
+                    meaning: '多面的な才能が一度に花開きます',
+                    aspect: '多才、柔軟性、適応力、選択肢',
+                    advice: '様々な角度から物事を見てみましょう'
+                },
+                reversed: {
+                    meaning: 'その多才さが散漫さに変わっています',
+                    aspect: '分散、集中力不足、混乱',
+                    advice: 'ひとつに絞ることも時には大切です'
+                }
+            },
+            {
+                name: 'レイザーバック',
+                emoji: '🦂',
+                color: '#F97316',
+                emotions: {
+                    joy: { label: '喜', desc: '自分の力で道を切り開く喜び。独立心が満たされます' },
+                    anger: { label: '怒', desc: '自分の領域を侵す者への怒り。毒針が光ります' },
+                    sorrow: { label: '哀', desc: '孤独な戦い。一人で立ち向かい続ける悲しみ' },
+                    calm: { label: '楽', desc: '自分の力への確信。揺るがぬ独立心' }
+                },
+                upright: {
+                    meaning: '独立と自力があなたを守ります',
+                    aspect: '独立心、自己防衛、強靭さ',
+                    advice: '自分の力を信じて、一人で立ちましょう'
+                },
+                reversed: {
+                    meaning: 'その独立心が孤立に変わっています',
+                    aspect: '孤立、攻撃性、助けを拒否',
+                    advice: '時には周囲に助けを求めることも強さです'
+                }
+            },
+            {
+                name: 'キメラ',
+                emoji: '😈',
+                color: '#EC4899',
+                emotions: {
+                    joy: { label: '喜', desc: '矛盾の統一による喜び。複雑さを受け入れた時の自由' },
+                    anger: { label: '怒', desc: '複雑で絡み合った怒り。単純ではない激情' },
+                    sorrow: { label: '哀', desc: '分裂する自分への悲しみ。複数の心が泣いています' },
+                    calm: { label: '楽', desc: '矛盾を抱えたままの安定。複雑さの中の調和' }
+                },
+                upright: {
+                    meaning: 'あなたの多面性が奇跡を生み出します',
+                    aspect: '革新、複雑性、多角的視点',
+                    advice: '自分の矛盾を受け入れてください'
+                },
+                reversed: {
+                    meaning: 'その矛盾があなたを引き裂いています',
+                    aspect: '混乱、分裂、自己矛盾',
+                    advice: 'どちらの自分なのか、整理する時間が必要です'
+                }
+            }
+        ];
+
+        // Set max date to today
+        document.getElementById('birthdate').max = new Date().toISOString().split('T')[0];
+
+        // Calculate creature based on birth date
+        function calculateCreature(date) {
+            const [year, month, day] = date.split('-').map(Number);
+            const total = year + month + day;
+            return MYTHICAL_CREATURES[total % MYTHICAL_CREATURES.length];
+        }
+
+        // Get emotion based on month and day
+        function getEmotion(date, creature) {
+            const [year, month, day] = date.split('-').map(Number);
+            const emotionIndex = (month + day) % 4;
+            const emotions = ['joy', 'anger', 'sorrow', 'calm'];
+            return creature.emotions[emotions[emotionIndex]];
+        }
+
+        // Handle form submission
+        document.getElementById('fortune-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const birthdate = document.getElementById('birthdate').value;
+            
+            if (!birthdate) return;
+
+            const creature = calculateCreature(birthdate);
+            const emotion = getEmotion(birthdate, creature);
+            const isUpright = Math.random() > 0.5;
+            const reading = isUpright ? creature.upright : creature.reversed;
+
+            // Hide form, show results
+            document.getElementById('form-section').classList.add('hidden');
+            
+            // Build results HTML
+            let resultsHTML = `
+                <div class="card result-card" style="border-top: 4px solid ${creature.color}; border-bottom: 4px solid ${creature.color};">
+                    <div class="result-emoji">${creature.emoji}</div>
+                    <h2 class="result-name" style="color: ${creature.color}">『${creature.name}』</h2>
+                    <div class="position">${isUpright ? '✓ 正位置' : '✗ 逆位置'}</div>
+                    <div class="emotion-box" style="background-color: ${creature.color}">
+                        <div class="emotion-label">${emotion.label} ${emotion.desc}</div>
+                    </div>
+                    <div class="reading-box" style="border-left: 4px solid ${creature.color}">
+                        <p class="reading-meaning" style="color: ${creature.color}">${reading.meaning}</p>
+                        <p><strong>側面:</strong> ${reading.aspect}</p>
+                        <p>${reading.advice}</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: ${creature.color}; margin: 0 0 0.8rem;">🎭 四つの顔</h3>
+                    <div class="traits-grid">
+            `;
+
+            Object.entries(creature.emotions).forEach(([key, emo]) => {
+                const isActive = emotion.label === emo.label ? '' : 'opacity: 0.5;';
+                resultsHTML += `
+                    <div class="trait-item" style="border-left: 4px solid ${creature.color}; ${isActive}">
+                        <div class="trait-label" style="color: ${creature.color}">${emo.label}</div>
+                        <p style="margin: 0;">${emo.desc}</p>
+                    </div>
+                `;
+            });
+
+            resultsHTML += `
+                    </div>
+                </div>
+
+                <div class="position-grid">
+                    <div class="position-card" style="border-top: 4px solid ${creature.color}; ${!isUpright ? 'opacity: 0.5;' : ''}">
+                        <h3 style="color: ${creature.color}">正位置</h3>
+                        <p><strong>意味:</strong> ${creature.upright.meaning}</p>
+                        <p><strong>側面:</strong> ${creature.upright.aspect}</p>
+                        <p><strong>ア:</strong> ${creature.upright.advice}</p>
+                    </div>
+                    <div class="position-card" style="border-top: 4px solid ${creature.color}; ${isUpright ? 'opacity: 0.5;' : ''}">
+                        <h3 style="color: ${creature.color}">逆位置</h3>
+                        <p><strong>意味:</strong> ${creature.reversed.meaning}</p>
+                        <p><strong>側面:</strong> ${creature.reversed.aspect}</p>
+                        <p><strong>ア:</strong> ${creature.reversed.advice}</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="reset-button" onclick="location.reload()">別の運命を読む</button>
+                </div>
+            `;
+
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.innerHTML = resultsHTML;
+            resultsSection.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
